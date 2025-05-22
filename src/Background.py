@@ -1,4 +1,4 @@
-##Checking if connectd
+##Checking if connectd with git desktop
 import pygame
 import sys
 import random
