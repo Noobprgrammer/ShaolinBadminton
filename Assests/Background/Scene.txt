@@ -1,0 +1,2 @@
+Create Scene1 folder, put all background image of scene 1 in that folder
+Create Scene2 folder, pul all background image of scene 2 in that folder
