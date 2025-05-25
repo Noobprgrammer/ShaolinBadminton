@@ -30,9 +30,8 @@ background = os.path.join(scriptDir, "..", "Background")
 
 # Asset paths
 BACKGROUND_PATH = os.path.join(background, "Background", "Background1", "Background1.jpg")
-MENU_CLOUD1_PATH = os.path.join(background, "Effects", "Assets", "Cloud1.png")
-MENU_CLOUD2_PATH = os.path.join(background, "Effects", "Assets", "Cloud2.png")
-MENU_GRASS_PATH = os.path.join(background, "Effects", "Assets", "Tree2.png")
+CLOUD1_PATH = os.path.join(background, "Effects", "Assets", "Cloud1.png")
+CLOUD2_PATH = os.path.join(background, "Effects", "Assets", "Cloud2.png")
 TREE1_PATH = os.path.join(background, "Effects", "Assets", "Tree1.png")
 TREE2_PATH = os.path.join(background, "Effects", "Assets", "Tree2.png")
 BIRD_PATH = os.path.join(background, "Effects", "Assets", "Bird2.png")
