@@ -527,11 +527,13 @@ while running:
                     if server == 1 and event.key == pygame.K_s:
                         start_serve(charge_power)
                         play_sound_effect("smash")
+                        trigger_hit_animation(1)
                         charging_serve = False
                         charge_power = 0
                     elif server == 2 and event.key == pygame.K_DOWN:
                         start_serve(charge_power)
                         play_sound_effect("smash")
+                        trigger_hit_animation(2)
                         charging_serve = False
                         charge_power = 0
 
