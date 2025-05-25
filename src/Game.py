@@ -507,11 +507,13 @@ while running:
                     player1_vel_y = JUMP_STRENGTH
                     player1_on_ground = False
                     player1_is_jumping = True
+                    play_sound_effect("jump")
                     set_player_animation_state(1, "jump")
                 if event.key == pygame.K_UP and player2_on_ground:
                     player2_vel_y = JUMP_STRENGTH
                     player2_on_ground = False
                     player2_is_jumping = True
+                    play_sound_effect("jump")
                     set_player_animation_state(2, "jump")
                 if serving:
                     if server == 1 and event.key == pygame.K_s:
