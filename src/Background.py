@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import math
+import random 
 
 # Initialize Pygame
 pygame.init()
@@ -17,6 +18,7 @@ screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("My Game Window")
 
+## Background 1
 # Asset paths - Now using dynamic paths like the game.py
 BACKGROUND_PATH = os.path.join(assetBackground, "Background1.jpg")
 TREE1_PATH = os.path.join(assetEffects, "Tree1.png")   
@@ -163,121 +165,199 @@ def apply_sky_lighting(screen, darkness_level):
         overlay.fill((20, 20, 40))
         screen.blit(overlay, (0, 0))
 
+# Load main menu assets
+main_menu_bg = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "MainMenu", "mainMenu.webp"))
+main_menu_bg = pygame.transform.scale(main_menu_bg, (screen_width, screen_height))
+
+menu_cloud1 = pygame.transform.scale(pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "MainMenu", "cloud2.png")).convert_alpha(),(150, 80))
+menu_cloud2 = pygame.transform.scale(pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "MainMenu", "cloud2.png")).convert_alpha(),(200, 80))
+menu_cloud1_x, menu_cloud1_y = 200, 100
+menu_cloud2_x, menu_cloud2_y = 50, 20
+menu_cloud1_speed = 0.3
+menu_cloud2_speed = 0.2
+
+menu_grass_image_original = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "MainMenu", "grass.png")).convert_alpha()
+
+menu_grass_data = [
+    {"x": 100, "y": 770, "scale": 1.8, "angle": 0, "sway_speed": 0.015},
+    {"x": 250, "y": 850, "scale": 1.7, "angle": 0, "sway_speed": 0.013},
+    {"x": 900, "y": 740, "scale": 1.7, "angle": 0, "sway_speed": 0.017},
+]
+
+# Load Background2 scene assets
+background2 = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "Background2.jpg"))
+background2 = pygame.transform.scale(background2, (screen_width, screen_height))
+
+lantern = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "lantern.png")).convert_alpha()
+lantern = pygame.transform.scale(lantern, (60, 80))
+
+lake = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "lakePool.png")).convert_alpha()
+lake = pygame.transform.scale(lake, (250, 140))
+lake_x, lake_y = 750, 560
+
+fish_image = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "fish.png")).convert_alpha()
+fish_image = pygame.transform.scale(fish_image, (50, 30))
+
+grass_image_original = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "grass.png")).convert_alpha()
+
+tree_image_original = pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "tree.png")).convert_alpha()
+
+cloud1 = pygame.transform.scale(pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "cloud2.png")).convert_alpha(),(200, 100))
+scene_cloud2 = pygame.transform.scale(pygame.image.load(os.path.join(scriptDir, "..", "Assests", "Background", "Background2", "cloud2.png")).convert_alpha(),(250, 120))
+cloud1_x, cloud1_y = 300, 40
+scene_cloud2_x, scene_cloud2_y = 200, 160
+cloud1_speed = 0.3
+scene_cloud2_speed = 0.2
+
+tree_configs = [
+    {"x": -250, "y": 230, "scale": 1.6, "speed": 0.011},
+    {"x": 40, "y": 350, "scale": 1.1, "speed": 0.012},
+    {"x": -70, "y": 300, "scale": 1.3, "speed": 0.009},
+    {"x": -90, "y": 360, "scale": 1.1, "speed": 0.010}
+]
+tree_data = []
+for config in tree_configs:
+    scaled = pygame.transform.scale(tree_image_original, (int(400 * config["scale"]), int(300 * config["scale"])))
+    tree_data.append({"image": scaled, "x": config["x"], "y": config["y"], "angle": 0, "sway_speed": config["speed"]})
+
+grass_patches = [
+    {"tree_index": 0, "offset_x": -10, "width": 150, "height": 110},
+    {"tree_index": 0, "offset_x": 20, "width": 180, "height": 100},
+    {"tree_index": 1, "offset_x": 0, "width": 170, "height": 105},
+    {"tree_index": 2, "offset_x": -15, "width": 180, "height": 120},
+    {"tree_index": 2, "offset_x": 10, "width": 170, "height": 115},
+    {"tree_index": 3, "offset_x": 5, "width": 145, "height": 90}
+]
+
+right_lantern_base_x = 540
+left_lantern_base_x = 380
+lantern_y = 420
+swing_angle = 20
+
+fish_list = []
+for i in range(3):
+    fish_list.append({
+        "origin_x": 800 + i * 40,
+        "origin_y": 630,
+        "angle": random.uniform(0, math.pi),
+        "radius": 70,
+        "speed": 0.03 + i * 0.01,
+        "direction": 1 if i % 2 == 0 else -1
+    })
+
+
 clock = pygame.time.Clock()
+
+# Main loop
 running = True
+current_scene = "menu"
 
 while running:
+    clock.tick(60)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN and current_scene == "menu":
+                current_scene = "scene1"
 
-    current_time = pygame.time.get_ticks()
+    screen.fill((0, 0, 0))
 
-    # Draw background
-    if background:
-        screen.blit(background, (0, 0))
-    else:
-        screen.fill((135, 206, 235))
+    if current_scene == "menu":
+        screen.blit(main_menu_bg, (0, 0))
 
-    # Calculate sun position and lighting
-    sun_x, sun_y, sun_progress = get_sun_position(current_time)
-    lights_on = should_lights_be_on(sun_progress)
-    
-    # Draw sun
-    if sun:
-        rotation_angle = (current_time * 0.05) % 360
-        rotated_sun = pygame.transform.rotate(sun, -rotation_angle)
-        sun_rect = rotated_sun.get_rect(center=(sun_x, sun_y))
-        
-        if sun_y < screen_height - 100:
-            screen.blit(rotated_sun, sun_rect.topleft)
+        # Animate clouds
+        menu_cloud1_x += menu_cloud1_speed
+        menu_cloud2_x += menu_cloud2_speed
+        if menu_cloud1_x > screen_width:
+            menu_cloud1_x = -200
+        if menu_cloud2_x > screen_width:
+            menu_cloud2_x = -250
+        screen.blit(menu_cloud1, (menu_cloud1_x, menu_cloud1_y))
+        screen.blit(menu_cloud2, (menu_cloud2_x, menu_cloud2_y))
 
-    # Draw clouds
-    if cloud2:
-        cloud2_x += cloud_speed2
-        if cloud2_x > screen_width + 200:
-            cloud2_x = -200
-        screen.blit(cloud2, (cloud2_x, asset_positions['cloud2'][1]))
+        # Animate grass
+        for g in menu_grass_data:
+            g["angle"] += g["sway_speed"]
+            sway = math.sin(g["angle"]) * 3
+            scaled = pygame.transform.scale(menu_grass_image_original, (int(120 * g["scale"]), int(80 * g["scale"])))
+            rotated = pygame.transform.rotate(scaled, sway)
+            rect = rotated.get_rect(midbottom=(g["x"], g["y"]))
+            screen.blit(rotated, rect.topleft)
 
-    if cloud5:
-        cloud5_x += cloud_speed5
-        if cloud5_x > screen_width + 200:
-            cloud5_x = -200
-        screen.blit(cloud5, (cloud5_x, asset_positions['cloud5'][1]))
+        # Trees
+        # for tree in menu_tree_data:
+        #     tree["angle"] += tree["sway_speed"]
+        #     sway = math.sin(tree["angle"]) * 2
+        #     rotated = pygame.transform.rotate(tree["image"], sway)
+        #     rect = rotated.get_rect(midbottom=(tree["x"] + tree["image"].get_width() // 2,
+        #                                        tree["y"] + tree["image"].get_height()))
+        #     screen.blit(rotated, rect.topleft)
 
-    # Draw temple
-    if temple:
-        screen.blit(temple, temple_rect.topleft)
+        # Title and instruction
+        title_font = pygame.font.SysFont("arial", 48, bold=True)
+        instruction_font = pygame.font.SysFont("arial", 32, bold=True)
+        title_text = title_font.render("Welcome to Shaolin Badminton", True, (255, 255, 255))
+        instruction_text = instruction_font.render("Press ENTER to Start", True, (255, 255, 255))
+        screen.blit(title_text, title_text.get_rect(center=(screen_width // 2, screen_height // 2 + 60)))
+        screen.blit(instruction_text, instruction_text.get_rect(center=(screen_width // 2, screen_height // 2 + 110)))
 
-    # Draw garden lamps with lighting effects
-    if garden_lamp and temple:
-        # Draw light glow first (behind the lamps)
-        # Calculate alpha based on time of day (0 to 100)
-        if sun_progress <= 0.2:
-            glow_alpha = int(100 * (1 - sun_progress / 0.2))  # Full at night, fades at sunrise
-        elif sun_progress >= 0.8:
-            glow_alpha = int(100 * ((sun_progress - 0.8) / 0.2))  # Fades in at sunset
-        else:
-            glow_alpha = 0  # Daytime
+    elif current_scene == "scene1":
+        screen.blit(background2, (0, 0))
 
-        # Offsets to adjust glow position
-        glow_offset_x = 90   # Rightward adjustment
-        glow_offset_y = 30   # Downward adjustment
-        strong_glow_radius = 80       # Bigger glow
-        strong_glow_alpha = 255      # Stronger brightness (0–255)
+        # Clouds
+        cloud1_x += cloud1_speed
+        scene_cloud2_x += scene_cloud2_speed
+        if cloud1_x > screen_width:
+            cloud1_x = -200
+        if scene_cloud2_x > screen_width:
+            scene_cloud2_x = -250
+        screen.blit(cloud1, (cloud1_x, cloud1_y))
+        screen.blit(scene_cloud2, (scene_cloud2_x, scene_cloud2_y))
 
-        if glow_alpha > 0:
-            draw_light_glow(screen, 
-                (garden_lamp_left_pos[0] + glow_offset_x, garden_lamp_left_pos[1] + glow_offset_y),
-                40, (255, 255, 200), glow_alpha)
-            
-            draw_light_glow(screen, 
-                (garden_lamp_right_pos[0] + glow_offset_x, garden_lamp_right_pos[1] + glow_offset_y),
-                40, (255, 255, 200), glow_alpha)
+        # Trees
+        for tree in tree_data:
+            tree["angle"] += tree["sway_speed"]
+            sway = math.sin(tree["angle"]) * 2
+            rotated = pygame.transform.rotate(tree["image"], sway)
+            rect = rotated.get_rect(midbottom=(tree["x"] + tree["image"].get_width() // 2,
+                                               tree["y"] + tree["image"].get_height()))
+            screen.blit(rotated, rect.topleft)
 
+        # Grass
+        for patch in grass_patches:
+            tree = tree_data[patch["tree_index"]]
+            sway = math.sin(tree["angle"]) * 2
+            rotated = pygame.transform.rotate(tree["image"], sway)
+            rect = rotated.get_rect(midbottom=(tree["x"] + tree["image"].get_width() // 2,
+                                               tree["y"] + tree["image"].get_height()))
+            grass_img = pygame.transform.scale(grass_image_original, (patch["width"], patch["height"]))
+            grass_rect = grass_img.get_rect(midbottom=(rect.centerx + patch["offset_x"], rect.bottom))
+            screen.blit(grass_img, grass_rect.topleft)
 
-        
-        # Draw the garden lamps
-        screen.blit(garden_lamp, garden_lamp_left_pos)
-        screen.blit(garden_lamp, garden_lamp_right_pos)
+        # Lake
+        screen.blit(lake, (lake_x, lake_y))
 
-    # Draw trees
-    if tree1_large:
-        screen.blit(tree1_large, asset_positions['tree1_large_left'])
-    if tree2_large:
-        screen.blit(tree2_large, asset_positions['tree2_large_right'])
+        # Lanterns
+        swing_angle += 0.05
+        swing_offset = math.sin(swing_angle) * 10
+        screen.blit(lantern, (left_lantern_base_x - swing_offset, lantern_y))
+        screen.blit(lantern, (right_lantern_base_x + swing_offset, lantern_y))
 
-    # Draw birds with movement
-    if bird1:
-        bird1_x += bird_speed1
-        if bird1_x > screen_width + 100:
-            bird1_x = -100
-        screen.blit(bird1, (bird1_x, asset_positions['bird1'][1]))
-
-    if bird2:
-        bird2_x += bird_speed2
-        if bird2_x > screen_width + 100:
-            bird2_x = -100
-        screen.blit(bird2, (bird2_x, asset_positions['bird2'][1]))
-
-    if bird3:
-        bird3_x += bird_speed3
-        if bird3_x > screen_width + 100:
-            bird3_x = -100
-        screen.blit(bird3, (bird3_x, asset_positions['bird3'][1]))
-
-    if bird4:
-        bird4_x += bird_speed4
-        if bird4_x < -100:
-            bird4_x = screen_width + 100
-        screen.blit(bird4, (bird4_x, asset_positions['bird4'][1]))
-
-    # Apply day/night lighting overlay
-    darkness_level = get_sky_lighting(sun_progress)
-    apply_sky_lighting(screen, darkness_level)
+        # Fish
+        for f in fish_list:
+            f["angle"] += f["speed"]
+            if f["angle"] > math.pi:
+                f["angle"] = 0
+                f["direction"] *= -1
+                f["origin_x"] += 3 * f["direction"]
+            fx = f["origin_x"] + math.cos(f["angle"]) * f["radius"] * f["direction"]
+            fy = f["origin_y"] - math.sin(f["angle"]) * f["radius"]
+            fish_draw = pygame.transform.flip(fish_image, True, False) if f["direction"] == -1 else fish_image
+            screen.blit(fish_draw, (fx, fy))
 
     pygame.display.flip()
-    clock.tick(60)
 
 pygame.quit()
 sys.exit()
